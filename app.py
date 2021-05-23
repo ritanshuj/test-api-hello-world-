@@ -3,7 +3,7 @@ from flask import Flask
 from flask_restful import Resource, Api, reqparse
 import requests
 from PIL import Image
-import json
+
 
 import pytesseract
 #pytesseract.pytesseract.tesseract_cmd='C:\Program Files\Tesseract-OCR/tesseract.exe'
@@ -142,7 +142,7 @@ class scrape(Resource):
 
 
 
-        return json.dumps(result, indent = 4),200
+        return result,200
 
 
 
