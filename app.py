@@ -1,12 +1,12 @@
-from flask import Flask
+from flask import Flask,jsonify,make_response
 
 from flask_restful import Resource, Api, reqparse
 import requests
 from PIL import Image
 
-
+import json
 import pytesseract
-#pytesseract.pytesseract.tesseract_cmd='C:\Program Files\Tesseract-OCR/tesseract.exe'
+
 import sys
 from pdf2image import convert_from_path
 import os
@@ -18,11 +18,11 @@ app = Flask(__name__)
 api = Api(app)
 
 APP_ROOT = os.path.dirname(sys.argv[0])
-
-if os.path.join(APP_ROOT, "images//"):
-    shutil.rmtree(os.path.join(APP_ROOT, "images//"))
-
 target = os.path.join(APP_ROOT, "images//")
+if os.path.isfile(target):
+   shutil.rmtree(target)
+
+
 
 token={ 'BP':['BP','Blood Pressure'],
         'Sugar':['Sugar','Random Sugar'],
@@ -54,11 +54,11 @@ token={ 'BP':['BP','Blood Pressure'],
 class scrape(Resource):
     def get(self):
         parser = reqparse.RequestParser()  # initialize
-
-
+        
+        
         parser.add_argument('tokens', required=True)
         parser.add_argument('imageId', required=True)
-
+        
         args = parser.parse_args()
 
         os.mkdir(target)
@@ -97,14 +97,14 @@ class scrape(Resource):
             f.write(text)
 
         f.close()
-
+           
 #----------------------------------------------
         result={}
         p = re.compile('\d+(\.\d+)?')
         with open(target+"out_text.txt",'r') as f:
 
             lines =f.readlines()
-
+            
             for line in lines:
                 line=line.replace(',','')
                 line=line.replace('-','')
@@ -140,9 +140,9 @@ class scrape(Resource):
         f.close()
         shutil.rmtree(target)
 
-
-
-        return result,200
+        
+        
+        return make_response(jsonify(result),200)
 
 
 
